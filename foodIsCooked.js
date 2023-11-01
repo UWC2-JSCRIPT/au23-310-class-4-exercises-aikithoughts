@@ -6,9 +6,24 @@
  * @returns {boolean} isCooked
  */
 const foodIsCooked = function(kind, internalTemp, doneness) {
-  // Write function HERE
-
-}
+  if (kind === 'chicken') {
+    if (internalTemp > 165) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (kind === 'beef') {
+    if (internalTemp > 138 && doneness === 'well') {
+      return true;
+    } else if (internalTemp === 138 && doneness === 'medium') {
+      return true;
+    } else if (internalTemp < 138 && doneness === 'rare') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
 
 
 

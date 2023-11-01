@@ -5,11 +5,25 @@
 //  * @constructor
 //  * @param {string} name - The name of the player
 //  */
-// class CardPlayer {}; //TODO
+class CardPlayer {
+    constructor(name) {
+        this.name = name;
+        this.hand = [];
+    }
+    drawCard() { 
+        const newCard = deck[Math.floor(Math.random() * 52)]  //draw a random card from the deck
+        this.hand.push(newCard);
+    }
+}; //TODO
 
 // // CREATE TWO NEW CardPlayers
-// const dealer; // TODO
-// const player; // TODO
+const dealer = new CardPlayer('dealer');
+const player = new CardPlayer('Player');
+
+// Test to see if the CardPlayer class is working right.
+player.drawCard();
+player.drawCard();
+console.log(player.hand);
 
 // /**
 //  * Calculates the score of a Blackjack hand

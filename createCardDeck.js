@@ -37,6 +37,8 @@ const getDeck = () => {
 
       if (displayVal === 'Ace') {
         card.val = 11
+      } else if (j > 10) {
+        card.val = 10
       }
 
       deck.push(card)

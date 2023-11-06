@@ -1,4 +1,4 @@
-// const blackjackDeck = getDeck();
+const blackjackDeck = getDeck();
 
 // /**
 //  * Represents a card player (including dealer).
@@ -128,8 +128,17 @@ const getMessage = (count, dealerCard) => {
  */
 const showHand = (player) => {
   const displayHand = player.hand.map((card) => card.displayVal);
+  const cardContainer = document.querySelector(`#${player.name.toLowerCase()}-container`);
+  
+  for (i = 0; i < displayHand.length; i++) {
+    const cardElement = document.createElement("div");
+    cardElement.innerHTML = displayHand[i];
+    cardContainer.appendChild(cardElement);
+  }
+
   console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
 }
+
 
 /**
  * Runs Blackjack Game

@@ -1,5 +1,6 @@
 const blackjackDeck = getDeck();
 
+
 // /**
 //  * Represents a card player (including dealer).
 //  * @constructor
@@ -11,7 +12,7 @@ class CardPlayer {
         this.hand = [];
     }
     drawCard() { 
-        const newCard = deck[Math.floor(Math.random() * 52)]  //draw a random card from the deck
+        const newCard = blackjackDeck[Math.floor(Math.random() * 52)]  //draw a random card from the deck
         this.hand.push(newCard);
     }
 }; 
@@ -126,17 +127,21 @@ const getMessage = (count, dealerCard) => {
  * Logs the player's hand to the console
  * @param {CardPlayer} player 
  */
-const showHand = (player) => {
+const showHand = (player, container) => { //updating function to include a container parameter.
   const displayHand = player.hand.map((card) => card.displayVal);
-  const cardContainer = document.querySelector(`#${player.name.toLowerCase()}-container`);
-  
-  for (i = 0; i < displayHand.length; i++) {
-    const cardElement = document.createElement("div");
-    cardElement.innerHTML = displayHand[i];
-    cardContainer.appendChild(cardElement);
-  }
 
-  console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
+  // Moving the following code to its own functin.
+  // const cardContainer = document.querySelector(`#${player.name.toLowerCase()}-container`);
+  
+  // for (i = 0; i < displayHand.length; i++) {
+  //   const cardElement = document.createElement("div");
+  //   cardElement.innerHTML = displayHand[i];
+  //   cardContainer.appendChild(cardElement);
+  // }
+
+  // Removing this logic to display the content on the screen.
+  //console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
+  container.innerHTML = `${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`;
 }
 
 
@@ -144,28 +149,40 @@ const showHand = (player) => {
  * Runs Blackjack Game
  */
 const startGame = function() {
+  const playerContainer = document.getElementById('player-container');
+  const dealerContainer = document.getElementById('dealer-container');
+  const messageContainer = document.getElementById('message-container');
+
   player.drawCard();
   dealer.drawCard();
   player.drawCard();
   dealer.drawCard();
 
+  showHand(player, playerContainer);
+
   let playerScore = calcPoints(player.hand).total;
-  showHand(player);
+  let dealerScore = calcPoints(dealer.hand).total;
+
+  if (playerScore === 21 || dealerScore === 21) {
+    showHand(dealer, dealerContainer);
+    return determineWinner(playerScore, dealerScore);
+  }
+  showHand(player, playerContainer);
   while (playerScore < 21 && confirm(getMessage(playerScore, dealer.hand[0]))) {
     player.drawCard();
     playerScore = calcPoints(player.hand).total;
-    showHand(player);
+    showHand(player, playerContainer);
   }
   if (playerScore > 21) {
+    showHand(dealer, dealerContainer);
     return 'You went over 21 - you lose!';
   }
   console.log(`Player stands at ${playerScore}`);
 
-  let dealerScore = calcPoints(dealer.hand).total;
   while (dealerScore < 21 && dealerShouldDraw(dealer.hand)) {
     dealer.drawCard();
     dealerScore = calcPoints(dealer.hand).total;
-    showHand(dealer);
+    showHand(dealer, dealerContainer);
   }
   if (dealerScore > 21) {
     return 'Dealer went over 21 - you win!';

@@ -1,4 +1,5 @@
 const blackjackDeck = getDeck();
+const playerTurn = true;
 
 
 // /**
@@ -49,7 +50,7 @@ const calcPoints = (hand) => {
         }
 
         // check to see if the hand is soft.
-        if (total <= 11) {
+        if (total < 11) {
             isSoft = true;
         }
         
@@ -95,23 +96,24 @@ const dealerShouldDraw = (dealerHand) => {
 //  * @param {number} dealerScore 
 //  * @returns {string} Shows the player's score, the dealer's score, and who wins
 //  */
-const determineWinner = (playerScore, dealerScore) => {
-  let winnerName = '';
+const determineWinner = (playerScore, dealerScore, messageContainer) => {
   let winningMessage = '';
-  if (playerScore > dealerScore) {
-    winnerName = player.name;
-  } else if (dealerScore > playerScore ) {
-    winnerName = dealer.name;
-  }
-
-  if (winnerName === '') {
-    winningMessage = `Push! No winner!`;
+  if (playerScore > 21) {
+    winningMessage = "You went over 21. You lose.";
+  } else if (dealerScore > 21) {
+    winningMessage = "Dealer busts. You win!";
   } else {
-    winningMessage = `${winnerName} wins!`;
+    if (playerScore > dealerScore) {
+      winningMessage = `${player.name} wins!`;
+    } else if (dealerScore > playerScore ) {
+      winningMessage = `${dealer.name} wins!`;
+    } else {
+      winningMessage = `Push! No winner!`;
+    }
   }
-  
 
-  return `Player score: ${playerScore}, Dealer score: ${dealerScore}. ${winningMessage}`
+  messageContainer.innerHTML = `Player score: ${playerScore}, Dealer score: ${dealerScore}. ${winningMessage}`;
+  console.log(`Player score: ${playerScore}, Dealer score: ${dealerScore}. ${winningMessage}`);
 }
 
 /**
@@ -129,19 +131,31 @@ const getMessage = (count, dealerCard) => {
  */
 const showHand = (player, container) => { //updating function to include a container parameter.
   const displayHand = player.hand.map((card) => card.displayVal);
-
-  // Moving the following code to its own functin.
-  // const cardContainer = document.querySelector(`#${player.name.toLowerCase()}-container`);
-  
-  // for (i = 0; i < displayHand.length; i++) {
-  //   const cardElement = document.createElement("div");
-  //   cardElement.innerHTML = displayHand[i];
-  //   cardContainer.appendChild(cardElement);
-  // }
-
-  // Removing this logic to display the content on the screen.
-  //console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
+  console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
   container.innerHTML = `${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`;
+}
+
+const displayModal = (playerContainer, messageContainer, playerScore, dealerHandler) => {
+  messageContainer.innerHTML = getMessage(playerScore, dealer.hand[0]);
+  const hitButton = document.createElement("button");
+  hitButton.innerHTML = "Hit";
+  hitButton.addEventListener("click", () => {
+    player.drawCard();
+    playerScore = calcPoints(player.hand).total;
+    showHand(player, playerContainer);
+    if (playerScore > 21) {
+        dealerHandler(playerScore);
+      }
+  });
+
+  const standButton = document.createElement("button");
+  standButton.innerHTML = "Stand";
+  standButton.addEventListener("click", () => dealerHandler(playerScore));
+  
+  messageContainer.appendChild(hitButton);
+  messageContainer.appendChild(standButton);
+
+  return playerScore;
 }
 
 
@@ -163,33 +177,23 @@ const startGame = function() {
   let playerScore = calcPoints(player.hand).total;
   let dealerScore = calcPoints(dealer.hand).total;
 
-  if (playerScore === 21 || dealerScore === 21) {
-    showHand(dealer, dealerContainer);
-    return determineWinner(playerScore, dealerScore);
-  }
   showHand(player, playerContainer);
-  while (playerScore < 21 && confirm(getMessage(playerScore, dealer.hand[0]))) {
-    player.drawCard();
-    playerScore = calcPoints(player.hand).total;
-    showHand(player, playerContainer);
-  }
-  if (playerScore > 21) {
+  const dealerHandler = (playerScore) => {
     showHand(dealer, dealerContainer);
-    return 'You went over 21 - you lose!';
+    if (playerScore < 21 ) {
+      while (dealerScore < 21 && dealerShouldDraw(dealer.hand)) {
+        dealer.drawCard();
+        dealerScore = calcPoints(dealer.hand).total;
+        showHand(dealer, dealerContainer);
+      }
+    }
+    determineWinner(playerScore, dealerScore, messageContainer);
   }
-  console.log(`Player stands at ${playerScore}`);
+  const dealerFirstCard = document.createElement("p");
+  dealerFirstCard.innerText = dealer.hand[0].displayVal;
+  dealerContainer.appendChild(dealerFirstCard);
+  displayModal(playerContainer, messageContainer, playerScore, dealerHandler);
 
-  while (dealerScore < 21 && dealerShouldDraw(dealer.hand)) {
-    dealer.drawCard();
-    dealerScore = calcPoints(dealer.hand).total;
-    showHand(dealer, dealerContainer);
-  }
-  if (dealerScore > 21) {
-    return 'Dealer went over 21 - you win!';
-  }
-  console.log(`Dealer stands at ${dealerScore}`);
-
-  return determineWinner(playerScore, dealerScore);
 }
 
-console.log(startGame());
+startGame();

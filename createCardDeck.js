@@ -12,22 +12,19 @@ const getDeck = () => {
       // for each loop, push a card object to the deck
 
       // special cases for when j > 10
-      const displayVal = ''
+      let displayVal = j
 
       switch (j) {
-        case j === 1:
+        case 1:
           displayVal = 'Ace'
-          break
-        case j > 1 && j <= 10:
-          displayVal = j
-          break
-        case j === 11:
+          break;
+        case 11:
           displayVal = 'Jack'
           break
-        case j === 12:
+        case 12:
           displayVal = 'Queen'
           break
-        case j === 13:
+        case 13:
           displayVal = 'King'
           break
       }
@@ -40,11 +37,14 @@ const getDeck = () => {
 
       if (displayVal === 'Ace') {
         card.val = 11
+      } else if (j > 10) {
+        card.val = 10
       }
 
       deck.push(card)
     }
   }
+  return deck;
 }
 
 // CHECKS
@@ -66,3 +66,8 @@ const cardHasDisplayVal =
   randomCard.displayVal &&
   typeof randomCard.displayVal === 'string'
 console.log(`Random card has display value? ${cardHasDisplayVal}`)
+
+// Uncomement to run tests
+// module.exports = {
+//   getDeck,
+// };

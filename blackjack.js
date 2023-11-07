@@ -109,7 +109,7 @@ const determineWinner = (playerScore, dealerScore, messageContainer) => {
  * @param {string} dealerCard 
  */
 const getMessage = (count, dealerCard) => {
-  return `Dealer showing ${dealerCard.displayVal}, your count is ${count}.  Draw card?`
+  return `Dealer showing ${dealerCard.displayVal}, your count is <span id="count">${count}</span>.  Draw card?`
 }
 
 /**
@@ -117,9 +117,15 @@ const getMessage = (count, dealerCard) => {
  * @param {CardPlayer} player 
  */
 const showHand = (player, container) => { //updating function to include a container parameter.
+  const spanCount = document.getElementById("count");
+  const score = calcPoints(player.hand).total;
   const displayHand = player.hand.map((card) => card.displayVal);
-  console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`);
-  container.innerHTML = `${player.name}'s hand is ${displayHand.join(', ')} (${calcPoints(player.hand).total})`;
+  
+  console.log(`${player.name}'s hand is ${displayHand.join(', ')} (${score})`);
+  container.innerHTML = `${player.name}'s hand is ${displayHand.join(', ')} (${score})`;
+  if (spanCount) {
+    spanCount.innerHTML = score;
+  }
 }
 
 const displayModal = (playerContainer, messageContainer, playerScore, dealerHandler) => {
@@ -138,9 +144,11 @@ const displayModal = (playerContainer, messageContainer, playerScore, dealerHand
   const standButton = document.createElement("button");
   standButton.innerHTML = "Stand";
   standButton.addEventListener("click", () => dealerHandler(playerScore));
-  
+  console.log("Player Score is: ", playerScore);
+  messageContainer.innerHTML = getMessage(playerScore, dealer.hand[0]);
   messageContainer.appendChild(hitButton);
   messageContainer.appendChild(standButton);
+  
 
   return playerScore;
 }

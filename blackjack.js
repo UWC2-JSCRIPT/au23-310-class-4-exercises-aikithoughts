@@ -30,46 +30,33 @@ const player = new CardPlayer('Player');
 //  * @returns {boolean} blackJackScore.isSoft
 //  */
 const calcPoints = (hand) => {
-    // let's see if we can get aces.
-    const aces = hand.filter(card => card.displayVal === 'Ace');
-    let blackjackScore = {};
-    let total = 0;
-    let isSoft = false;
+  const aces = hand.filter(card => card.displayVal === 'Ace');
+  let blackjackScore = {};
+  let total = 0;
+  let isSoft = false;
 
-    if (aces.length > 0 ) {
-        // We have some aces!
-        for (i = 0; i < hand.length; i++) {
-            total = total + hand[i].val;
-        }
+  for (const card of hand) {
+      total += card.val;
+  }
 
-        // Adjusting ace values if needed.
-        for (const ace of aces) {
-            if (total >= 21) {
-                total = total - 10;
-            }
-        }
+  if (aces.length > 0) {
+      // Check if the total is greater than 21 and there's at least one ace.
+      if (total > 21) {
+          total -= 10;
+      }
 
-        // check to see if the hand is soft.
-        if (total < 11) {
-            isSoft = true;
-        }
-        
-    } else {
+      // Check if the hand is soft.
+      if (total < 11) {
+          isSoft = true;
+      }
+  }
 
-        // No aces; calculate as normal.
-        for (i = 0; i < hand.length; i++) {
-            total = total + hand[i].val;
-        }
-    }
+  blackjackScore = {
+      total: total,
+      isSoft: isSoft
+  };
 
-    // Add values to the blackjackScore object.
-    blackjackScore = {
-        total: total,
-        isSoft : isSoft
-    };
-
-    return blackjackScore;
-
+  return blackjackScore;
 }
 
 // /**
@@ -158,6 +145,14 @@ const displayModal = (playerContainer, messageContainer, playerScore, dealerHand
   return playerScore;
 }
 
+const checkForBlackjack = (playerScore, dealerScore) => {
+  if (playerScore === 21 || dealerScore === 21) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 
 /**
  * Runs Blackjack Game
@@ -172,10 +167,14 @@ const startGame = function() {
   player.drawCard();
   dealer.drawCard();
 
-  showHand(player, playerContainer);
+  //showHand(player, playerContainer);
 
   let playerScore = calcPoints(player.hand).total;
   let dealerScore = calcPoints(dealer.hand).total;
+
+  if (checkForBlackjack === true) {
+    determineWinner(playerScore, dealerScore, messageContainer);
+  }
 
   showHand(player, playerContainer);
   const dealerHandler = (playerScore) => {

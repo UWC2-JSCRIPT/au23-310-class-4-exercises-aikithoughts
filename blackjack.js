@@ -1,5 +1,8 @@
-const blackjackDeck = getDeck();
-const playerTurn = true;
+// Uncomment CardDeck to run tests.
+// const CardDeck = require('./createCardDeck.js');
+//const blackjackDeck = CardDeck.getDeck();
+
+const blackjackDeck = getDeck();  // Comment this out when testing.
 
 
 // /**
@@ -41,12 +44,17 @@ const calcPoints = (hand) => {
 
   if (aces.length > 0) {
       // Check if the total is greater than 21 and there's at least one ace.
-      if (total > 21) {
-          total -= 10;
+      for (i = 0; i < aces.length; i ++) {
+        if (total > 21) {
+            total -= 10; // subtract 10 from the total
+            aces[i].val = 1; // set the value of ace to 1
+        }
       }
 
+      const aceAtEleven = aces.some(ace => ace.val === 11);
+
       // Check if the hand is soft.
-      if (total < 11) {
+      if (aceAtEleven === true) {
           isSoft = true;
       }
   }
@@ -204,3 +212,10 @@ const startGame = function() {
 }
 
 startGame();
+
+
+// Uncomment when testing.
+// module.exports = {
+//   CardPlayer,
+//   calcPoints,
+// }
